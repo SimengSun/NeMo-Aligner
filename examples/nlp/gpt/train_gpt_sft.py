@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-
+import os
 import torch.multiprocessing as mp
 from omegaconf.omegaconf import OmegaConf, open_dict
 
@@ -246,6 +246,18 @@ def main(cfg) -> None:
 
     if custom_trainer_state_dict is not None:
         sft_trainer.load_state_dict(custom_trainer_state_dict)
+    
+    print(sft_trainer.model)
+    tunable_params = os.environ["TUNABLE_PARAMS"].split(",")
+    for name, param in sft_trainer.model.named_parameters():
+        if any(x in name for x in tunable_params):
+            param.requires_grad = True
+        else:
+            param.requires_grad = False
+    print("="*23)
+
+    for name, param in sft_trainer.model.named_parameters():
+        print(name, param.requires_grad)
 
     sft_trainer.fit()
 
