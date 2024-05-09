@@ -248,7 +248,7 @@ def main(cfg) -> None:
         sft_trainer.load_state_dict(custom_trainer_state_dict)
     
     print(sft_trainer.model)
-    tunable_params = os.environ["TUNABLE_PARAMS"].split(",")
+    tunable_params = os.environ["TUNABLE_PARAMS"].split("+")
     for name, param in sft_trainer.model.named_parameters():
         if any(x in name for x in tunable_params):
             param.requires_grad = True
